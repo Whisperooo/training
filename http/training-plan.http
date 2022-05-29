@@ -1,0 +1,17 @@
+POST http://175.28.2.10/tp/create
+Content-Type: application/json
+
+{
+  "age": 18,
+  "lvl": 1,
+  "sex": 0,
+  "parts": [1, 2],
+  "days": [2, 5]
+}
+
+###
+
+GET http://175.28.2.10/tp/7
+Content-Type: application/json
+
+###

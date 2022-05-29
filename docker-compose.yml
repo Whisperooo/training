@@ -1,0 +1,51 @@
+version: "3"
+
+services:
+
+  nginx:
+    build:
+      context: .
+      dockerfile: ./build/components/nginx/Dockerfile
+    links:
+      - php
+    volumes:
+      - ./:/srv/training
+    networks:
+      training:
+        ipv4_address: ${API_IP_ADDRESS?}
+
+  php:
+    build:
+      context: .
+      dockerfile: ./build/components/php/dev/Dockerfile
+    command: ["bash", "-c", "php-fpm"]
+    links:
+      - mariadb
+
+    environment:
+      - COMPOSER_MEMORY_LIMIT=1.5G
+
+    volumes:
+      - ./:/srv/training
+
+    networks:
+      training:
+        ipv4_address: ${PHP_IP_ADDRESS?}
+
+  mariadb:
+    build: ./build/components/mariadb
+    environment:
+      - MYSQL_DATABASE=${MYSQL_DATABASE?}
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD?}
+      - MYSQL_USER=${MYSQL_USER?}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD?}
+    networks:
+      training:
+        ipv4_address: ${MYSQL_IP_ADDRESS?}
+
+networks:
+  training:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: ${PROJECT_SUBNET?}
